@@ -3,11 +3,31 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 get_filename_component(PROJNAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-Project(${PROJNAME})
-Message(STATUS "-------------------------------")
-Message(STATUS "Processing Project ${PROJNAME}:")
+project(${PROJNAME} VERSION 1.0.1)
+message(STATUS "-------------------------------")
+message(STATUS "Processing Project ${PROJNAME}:")
 
-add_compile_definitions(SAMPLE_NAME="${CMAKE_PROJECT_NAME}")
+add_compile_definitions(
+    SAMPLE_NAME="${CMAKE_PROJECT_NAME}"
+    SAMPLE_VERSION="${PROJECT_VERSION}"
+)
+
+find_package(Git)
+if(${Git_FOUND})
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --short HEAD
+        OUTPUT_VARIABLE APP_COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_CURRENT_SOURCE_DIR} diff --quiet
+        RESULT_VARIABLE APP_HAS_UNCOMMITTED_CHANGES
+    )
+    add_compile_definitions(
+        SAMPLE_COMMIT_HASH="${APP_COMMIT_HASH}"
+        SAMPLE_HAS_UNCOMMITTED_CHANGES=${APP_HAS_UNCOMMITTED_CHANGES}
+    )
+endif()
 
 # ####################################################################################
 # look for nvpro_core 1) as a sub-folder 2) at some other locations
@@ -37,16 +57,16 @@ _add_nvpro_core_lib()
 include(ExternalProject)
 set(OPENXR_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin_x64/openxr)
 ExternalProject_Add(
-  OpenXR-SDK
-  GIT_REPOSITORY https://github.com/KhronosGroup/OpenXR-SDK.git
-  GIT_TAG release-1.1.38
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${OPENXR_INSTALL_DIR}
-  # Shorten paths for systems that run into MAX_PATH constraints
-  PREFIX ${CMAKE_BINARY_DIR}/OpenXR
-  BINARY_DIR ${CMAKE_BINARY_DIR}/OpenXR/build
-  SOURCE_DIR ${CMAKE_BINARY_DIR}/OpenXR/src
-  STAMP_DIR ${CMAKE_BINARY_DIR}/OpenXR/stamp
-  TMP_DIR ${CMAKE_BINARY_DIR}/OpenXR/tmp
+    OpenXR-SDK
+    GIT_REPOSITORY https://github.com/KhronosGroup/OpenXR-SDK.git
+    GIT_TAG release-1.1.38
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${OPENXR_INSTALL_DIR}
+    # Shorten paths for systems that run into MAX_PATH constraints
+    PREFIX ${CMAKE_BINARY_DIR}/OpenXR
+    BINARY_DIR ${CMAKE_BINARY_DIR}/OpenXR/build
+    SOURCE_DIR ${CMAKE_BINARY_DIR}/OpenXR/src
+    STAMP_DIR ${CMAKE_BINARY_DIR}/OpenXR/stamp
+    TMP_DIR ${CMAKE_BINARY_DIR}/OpenXR/tmp
 )
 # The OpenXR loader library ends in a `d` only if it's built in
 # debug mode and on Windows.

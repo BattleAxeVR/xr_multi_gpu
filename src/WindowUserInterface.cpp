@@ -70,7 +70,10 @@ void WindowUserInterface::initialize(const Renderer &p_renderer, uint32_t p_pres
   for (vk::UniqueSemaphore &sem : m_swapchainImageReadySemaphores) {
     sem = p_renderer.vkDevice().createSemaphoreUnique({});
   }
-  m_frameReadySemaphore = p_renderer.vkDevice().createSemaphoreUnique({});
+  m_frameReadySemaphores.reserve(MAX_QUEUED_FRAMES);
+  for (uint32_t i = 0; i < MAX_QUEUED_FRAMES; ++i) {
+    m_frameReadySemaphores.emplace_back(p_renderer.vkDevice().createSemaphoreUnique({}));
+  }
   this->buildProjections();
 }
 
@@ -99,6 +102,10 @@ vk::Semaphore WindowUserInterface::getSwapchainImageReadySemaphore() {
 
 void WindowUserInterface::releaseSwapchainImage() {
   m_swapchainImageReadySemaphoreIndex = (m_swapchainImageReadySemaphoreIndex + 1) % MAX_QUEUED_FRAMES;
+}
+
+vk::Semaphore WindowUserInterface::getFrameReadySemaphore() {
+  return m_frameReadySemaphores[g_app->getCurrentFrameIndex() % MAX_QUEUED_FRAMES].get();
 }
 
 void WindowUserInterface::update(float p_millis) {
@@ -200,7 +207,7 @@ StereoProjection WindowUserInterface::getCurrentFrameProjection(StereoProjection
 }
 
 void WindowUserInterface::endFrame(vk::Queue p_presentGraphicsQueue) {
-  m_window.present(p_presentGraphicsQueue, m_currentSwapchainImageIndex.value(), m_frameReadySemaphore.get());
+  m_window.present(p_presentGraphicsQueue, m_currentSwapchainImageIndex.value(), this->getFrameReadySemaphore());
 }
 
 float WindowUserInterface::getAspectRatioPerEye() {

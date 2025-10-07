@@ -44,7 +44,7 @@ public:
   FrameRenderTargets acquireSwapchainImages(vk::Device p_device) override;
   vk::Semaphore getSwapchainImageReadySemaphore() override;
   void releaseSwapchainImage() override;
-  vk::Semaphore getFrameReadySemaphore() override { return m_frameReadySemaphore.get(); }
+  vk::Semaphore getFrameReadySemaphore() override;
   void endFrame(vk::Queue p_presentGraphicsQueue) override;
   float getAspectRatioPerEye();
 
@@ -58,7 +58,7 @@ private:
   std::optional<uint32_t> m_currentSwapchainImageIndex;
   std::array<vk::UniqueSemaphore, MAX_QUEUED_FRAMES> m_swapchainImageReadySemaphores;
   size_t m_swapchainImageReadySemaphoreIndex = 0;
-  vk::UniqueSemaphore m_frameReadySemaphore;
+  std::vector<vk::UniqueSemaphore> m_frameReadySemaphores;
   bool m_fast = true;
   float m_ipd = 0.065f;
   float m_projectionPlaneDistance = 10.0f;

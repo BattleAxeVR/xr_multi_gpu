@@ -253,7 +253,7 @@ void Scene::render(uint32_t p_physicalDeviceIndex, vk::CommandBuffer p_cmdBuffer
                    const Mat4x4f &p_view, const Mat4x4f &p_projection) {
   std::vector<vk::BufferMemoryBarrier2> preUploadBarriers;
   if (g_app->getCurrentFrameIndex() == 0) {
-    preUploadBarriers.emplace_back(vk::PipelineStageFlagBits2::eAllCommands, vk::AccessFlagBits2::eHostWrite,
+    preUploadBarriers.emplace_back(vk::PipelineStageFlagBits2::eHost, vk::AccessFlagBits2::eHostWrite,
                                    vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferRead,
                                    VK_QUEUE_FAMILY_IGNORED, VK_QUEUE_FAMILY_IGNORED, m_uploadBuffer.get(), 0,
                                    m_uploadMemPool.size);

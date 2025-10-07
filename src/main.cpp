@@ -20,10 +20,25 @@
 
 #include "App.hpp"
 
+#ifndef SAMPLE_VERSION
+#define SAMPLE_VERSION "unknown"
+#endif
+
 int main(int p_argc, char **p_argv) {
 #ifdef _WIN32
   SetConsoleOutputCP(CP_UTF8);
 #endif
-  XRMG_INFO("NVIDIA DesignWorks: " SAMPLE_NAME "\n");
+  std::string buildInfo = "custom build, based on unknown commit";
+#ifdef SAMPLE_COMMIT_HASH
+  if (SAMPLE_HAS_UNCOMMITTED_CHANGES) {
+    buildInfo = "custom build, based on commit " SAMPLE_COMMIT_HASH;
+  } else {
+    buildInfo = "commit " SAMPLE_COMMIT_HASH;
+  }
+#endif
+  XRMG_INFO("Sample     │ NVIDIA DesignWorks: " SAMPLE_NAME);
+  XRMG_INFO("Version    │ " SAMPLE_VERSION);
+  XRMG_INFO("Build info │ {}", buildInfo);
+  XRMG_INFO("");
   return xrmg::App({p_argv, p_argv + p_argc}).run();
 }
