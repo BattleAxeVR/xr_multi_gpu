@@ -56,19 +56,18 @@ float perlinLayered(float2 tex) {
   return 0.5f + 8.0f / 15.0f * v;
 }
 
-float3 toFloat3Color(uint value) {
-  return float3(float((value >> 16) & 0xff), float((value) >> 8 & 0xff), float(value & 0xff)) / 255.0f;
-}
+#define TO_FLOAT3_COLOR(value)                                                                                         \
+  (float3(float(((value) >> 16) & 0xffu), float((value) >> 8 & 0xffu), float((value) & 0xff)) / 255.0f)
 
 static const uint g_numGradients = 6;
 static const uint g_gradientSize = 3;
 static const float3 g_gradients[g_numGradients][g_gradientSize] = {
-  { toFloat3Color(0xfff1bf), toFloat3Color(0xec458d), toFloat3Color(0x474ed7) },
-  { toFloat3Color(0x2c6cbc), toFloat3Color(0x71c3f7), toFloat3Color(0xf6f6f6) },
-  { toFloat3Color(0x1a2766), toFloat3Color(0xae1b1e), toFloat3Color(0xfc9f32) },
-  { toFloat3Color(0x074170), toFloat3Color(0x7e9012), toFloat3Color(0xfff708) },
-  { toFloat3Color(0x40E0D0), toFloat3Color(0xFF8C00), toFloat3Color(0xFF0080) },
-  { toFloat3Color(0xff0000), toFloat3Color(0x00ff00), toFloat3Color(0x0000ff) }
+  { TO_FLOAT3_COLOR(0xfff1bfu), TO_FLOAT3_COLOR(0xec458du), TO_FLOAT3_COLOR(0x474ed7u) },
+  { TO_FLOAT3_COLOR(0x2c6cbcu), TO_FLOAT3_COLOR(0x71c3f7u), TO_FLOAT3_COLOR(0xf6f6f6u) },
+  { TO_FLOAT3_COLOR(0x1a2766u), TO_FLOAT3_COLOR(0xae1b1eu), TO_FLOAT3_COLOR(0xfc9f32u) },
+  { TO_FLOAT3_COLOR(0x074170u), TO_FLOAT3_COLOR(0x7e9012u), TO_FLOAT3_COLOR(0xfff708u) },
+  { TO_FLOAT3_COLOR(0x40E0D0u), TO_FLOAT3_COLOR(0xFF8C00u), TO_FLOAT3_COLOR(0xFF0080u) },
+  { TO_FLOAT3_COLOR(0xff0000u), TO_FLOAT3_COLOR(0x00ff00u), TO_FLOAT3_COLOR(0x0000ffu) }
 };
 
 float3 sampleColorGradient(uint colorGradientIdx, float t) {
